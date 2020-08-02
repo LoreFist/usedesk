@@ -47,7 +47,7 @@ class ClientsController extends BaseController {
      * @return JsonResponse
      */
     public function update(ClientsRequest $request, $id) {
-        return $this->sendResponse(ClientsService::updateClient($request, $id)->toArray(), '');
+        return $this->sendResponse([], ClientsService::updateClient($request, $id));
     }
 
     /**

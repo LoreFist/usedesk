@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Clients;
 use App\Emails;
 use App\Http\Requests\ClientsRequest;
+use App\Logs;
 use App\Phones;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,7 +27,7 @@ class ClientsService {
                 if ( !is_null($request->phones) AND is_array($request->phones)) {
                     foreach ($request->phones as $phone) {
                         $modelPhones            = new Phones();
-                        $modelPhones->client_id = $model->id;
+                        $modelPhones->client_id = $model->client_id;
                         $modelPhones->phone     = $phone;
                         $modelPhones->save();
                         $phones[] = $modelPhones->toArray();
@@ -37,13 +38,14 @@ class ClientsService {
                 if ( !is_null($request->emails) AND is_array($request->emails)) {
                     foreach ($request->emails as $email) {
                         $modelEmails            = new Emails();
-                        $modelEmails->client_id = $model->id;
+                        $modelEmails->client_id = $model->client_id;
                         $modelEmails->email     = $email;
                         $modelEmails->save();
                         $emails[] = $modelEmails->toArray();
                     }
                 }
 
+                dd(LogService::save(Logs::TYPE_CREATE, ['client_id'=>$model->client_id]));
                 return ['client' => $model->toArray(), 'phones' => $phones, 'emails' => $emails];
             }
 
@@ -63,6 +65,8 @@ class ClientsService {
             Phones::where('client_id', $id)->delete();
             Emails::where('client_id', $id)->delete();
             Clients::where('client_id', '=', $id)->delete();
+
+            LogService::save(Logs::TYPE_DELETE, ['client_id'=>$id]);
             return true;
         }
         return false;
@@ -74,9 +78,11 @@ class ClientsService {
      *
      * @return mixed
      */
-    public static function updateClient($request, $id){
+    public static function updateClient($request, $id) {
         $model = self::findClient($id);
         $model->fill($request->all());
+
+        LogService::save(Logs::TYPE_UPDATE, $request->all());
         return $model->update();
     }
 
@@ -94,13 +100,14 @@ class ClientsService {
 
         if ($request->first_name) $modelClient->where('first_name', 'LIKE', '%' . $request->first_name . '%');
         if ($request->last_name) $modelClient->where('last_name', 'LIKE', '%' . $request->last_name . '%');
-        if ($request->phone) $modelClient->whereHas('phones',function($q) use ($request){
+        if ($request->phone) $modelClient->whereHas('phones', function ($q) use ($request) {
             $q->where('phone', $request->phone);
         });
-        if ($request->email) $modelClient->whereHas('emails',function($q) use ($request){
+        if ($request->email) $modelClient->whereHas('emails', function ($q) use ($request) {
             $q->where('email', $request->email);
         });
 
+        LogService::save(Logs::TYPE_SEARCH, $request->all());
         return $modelClient->get();
     }
 }

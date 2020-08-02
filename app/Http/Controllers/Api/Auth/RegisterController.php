@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Http\Requests\Api\Auth\RegisterFormRequest;
+use App\Logs;
+use App\Services\LogService;
 use App\User;
 
 class RegisterController extends BaseController {
@@ -16,7 +18,7 @@ class RegisterController extends BaseController {
 
         $success['id']   = $user->user_id;
         $success['name'] = $user->name;
-
+        LogService::save(Logs::TYPE_REGISTER);
         return $this->sendResponse($success, 'User register');
     }
 }
