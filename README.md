@@ -10,6 +10,11 @@
 3. `php artisan migrate`
 4. `php artisan passport:install`
 5. `php artisan serve`
+6. `php artisan key:generate`
+7. `php artisan config:cache`
+
+
+test openserver: php 7.4 mysql 8.0 nginx 1.17
 
 ##### Точки доступа
 
