@@ -25,7 +25,7 @@ Route::group(['namespace' => 'Api'], function () {
     });
 
     Route::resource('/clients', 'ClientsController')->only([
-        'index', 'show', 'store', 'update', 'destroy', 'search'
+        'show', 'store', 'update', 'destroy', 'search'
     ])->middleware('auth:api');
 
     Route::post('/clients/search', 'ClientsController@search')->middleware('auth:api');

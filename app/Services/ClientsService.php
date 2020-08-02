@@ -45,7 +45,6 @@ class ClientsService {
                     }
                 }
 
-                dd(LogService::save(Logs::TYPE_CREATE, ['client_id'=>$model->client_id]));
                 return ['client' => $model->toArray(), 'phones' => $phones, 'emails' => $emails];
             }
 
@@ -92,7 +91,7 @@ class ClientsService {
      * @return mixed
      */
     public static function findClient($id) {
-        return Clients::with(['phones', 'emails'])->where('client_id', '=', $id)->firstOrFail();
+        return Clients::with(['phones', 'emails'])->where('client_id', '=', $id)->first();
     }
 
     public static function searchClient($request) {
