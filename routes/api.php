@@ -1,6 +1,5 @@
 <?php
 
-use http\Client\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,4 +23,10 @@ Route::group(['namespace' => 'Api'], function () {
         Route::post('login', 'LoginController');
         Route::post('logout', 'LogoutController')->middleware('auth:api');
     });
+
+    Route::resource('/clients', 'ClientsController')->only([
+        'index', 'show', 'store', 'update', 'destroy', 'search'
+    ])->middleware('auth:api');
+
+    Route::post('/clients/search', 'ClientsController@search')->middleware('auth:api');
 });

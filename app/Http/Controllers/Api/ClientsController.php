@@ -2,32 +2,25 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Clients;
 use App\Http\Requests\ClientsRequest;
+use App\Services\ClientsService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
 class ClientsController extends BaseController {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return JsonResponse
-     */
-    public function index() {
-        $models = Clients::all();
-        return $this->sendResponse($models->toArray(), 'all clients');
-    }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param ClientsRequest $request
      *
      * @return JsonResponse
      */
     public function store(ClientsRequest $request) {
-        $model = Clients::create($request->validated());
-        return $this->sendResponse($model->toArray(), 'created ok');
+        $result = ClientsService::saveClient($request);
+        if (is_array($result))
+            return $this->sendResponse($result, 'created ok');
+        else
+            return $this->sendError('save error');
     }
 
     /**
@@ -38,35 +31,42 @@ class ClientsController extends BaseController {
      * @return JsonResponse
      */
     public function show($id) {
-        $model = Clients::find($id);
+        $model = ClientsService::findClient($id);
         if (is_null($model)) {
             return $this->sendError('not found');
         }
-        return $this->sendResponse($model->toArray(), 'client id=' + $id);
+        return $this->sendResponse($model->toArray(), '');
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param Clients                  $clients
+     * @param ClientsRequest $request
+     * @param                $id
      *
-     * @return Response
+     * @return JsonResponse
      */
-    public function update(ClientsRequest $request, Clients $clients) {
-        //
+    public function update(ClientsRequest $request, $id) {
+        return $this->sendResponse(ClientsService::updateClient($request, $id)->toArray(), '');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Clients $clients
+     * @param $id
      *
      * @return JsonResponse
-     * @throws \Exception
      */
-    public function destroy(Clients $clients) {
-        $clients->delete();
-        return $this->sendResponse($clients->toArray(), 'deleted ok');
+    public function destroy($id) {
+        return $this->sendResponse([], ClientsService::deleteClient($id));
+    }
+
+    /**
+     * @param ClientsRequest $request
+     *
+     * @return JsonResponse
+     */
+    public function search(ClientsRequest $request) {
+        return $this->sendResponse(ClientsService::searchClient($request)->toArray(), 'search');
     }
 }

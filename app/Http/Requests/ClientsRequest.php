@@ -3,8 +3,17 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class ClientsRequest extends FormRequest {
+
+    public $user_id;
+
+    public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null) {
+        $this->user_id = Auth::User()->user_id;
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -23,17 +32,25 @@ class ClientsRequest extends FormRequest {
         $rules = [
             'first_name' => 'required|string:clients,first_name',
             'last_name'  => 'required|string:clients,last_name',
-            'phone'      => 'required|string|unique:phones,phone',
-            'email'      => 'required|string|unique:emails,email',
+            'phones'     => 'array|unique:clients_phones,phone',
+            'emails'     => 'array|unique:clients_emails,email'
         ];
 
         switch ($this->getMethod()) {
             case 'POST':
-            case 'PUT':
+                if ($this->getPathInfo() == '/api/clients/search') {
+                    return [
+                        'first_name' => 'string',
+                        'last_name'  => 'string',
+                        'phone'      => 'integer',
+                        'email'      => 'string'
+                    ];
+                }
                 return $rules;
-            case 'DELETE':
+            CASE 'PUT':
                 return [
-                    'client_id' => 'required|integer|exists:clients,client_id'
+                    'first_name' => 'string:clients,first_name',
+                    'last_name'  => 'string:clients,last_name'
                 ];
         }
     }
