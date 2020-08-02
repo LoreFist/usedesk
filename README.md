@@ -7,8 +7,8 @@
 
 1. `composer install`
 2. поправить конфиг подключения к БД в файле `.env`
-3. `php artisan passport:install`
-4. `php artisan migrate`
+3. `php artisan migrate`
+4. `php artisan passport:install`
 5. `php artisan serve`
 
 ##### Точки доступа
